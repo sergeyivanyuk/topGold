@@ -28,7 +28,7 @@ npm --version
 Склонируйте репозиторий или загрузите файлы проекта на сервер:
 
 ```bash
-git clone <ваш-репозиторий> /opt/top-gold
+git clone <https://github.com/sergeyivanyuk/topGold> /opt/top-gold
 cd /opt/top-gold
 ```
 
