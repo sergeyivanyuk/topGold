@@ -1,0 +1,84 @@
+{
+	"_commentt": "блок с количеством игроков сегодня и количеством выплаченной голды",
+	"stats": {
+		"playersToday": "1482",
+		"goldIssued": "13 560 950"
+	},
+	"_comments": "Блок с игроками username - ник, gold - количество голды",
+	"recentWins": [
+		{
+			"username": "PlayerX",
+			"gold": "12 500"
+		},
+		{
+			"username": "LuckyBoy",
+			"gold": "8 300"
+		},
+		{
+			"username": "GoldHunter",
+			"gold": "25 000"
+		},
+		{
+			"username": "Winner777",
+			"gold": "5 600"
+		},
+		{
+			"username": "ProGamer",
+			"gold": "15 200"
+		},
+		{
+			"username": "GoldHunter",
+			"gold": "25 000"
+		},
+		{
+			"username": "Winner777",
+			"gold": "5 600"
+		},
+		{
+			"username": "ProGamer",
+			"gold": "15 200"
+		}
+	],
+	"tariffs": [
+		{
+			"id": "standard",
+			"name": "Стандарт",
+			"price": 179,
+			"goldAmount": 1000,
+			"bonusGold": 0,
+			"icon": "/golds.png",
+			"bonusText": "ШАНСЫ ЕСТЬ",
+			"chanceText": null
+		},
+		{
+			"id": "profitable",
+			"name": "Выгодный",
+			"price": 537,
+			"goldAmount": 3500,
+			"bonusGold": 500,
+			"icon": "/super.png",
+			"bonusText": "+500 бонусной голды",
+			"chanceText": "Отличный шанс!"
+		},
+		{
+			"id": "premium",
+			"name": "Премиум",
+			"price": 825,
+			"goldAmount": 6000,
+			"bonusGold": 1000,
+			"icon": "/premium.png",
+			"bonusText": "+1000 бонусной голды",
+			"chanceText": "Идеальный шанс!"
+		},
+		{
+			"id": "lux",
+			"name": "Люкс",
+			"price": 1479,
+			"goldAmount": 12000,
+			"bonusGold": 2000,
+			"icon": "/lux.png",
+			"bonusText": "+2000 бонусной голды",
+			"chanceText": "Секретный шанс!"
+		}
+	]
+}
