@@ -1,7 +1,7 @@
 {
 	"name": "TopGold",
 	"short_name": "TopGold",
-	"description": "Крути рулетку и выигрывай золото!",
+	"description": "Покупай голду выгодно!",
 	"start_url": "/",
 	"display": "standalone",
 	"background_color": "#0a0a0a",
