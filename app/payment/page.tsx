@@ -144,8 +144,9 @@ function PaymentContent() {
 						/>
 					</div>
 					<div
-						className={`flex w-full items-center justify-between gap-2 py-5 px-5 rounded-4xl bg-radial-gold cursor-pointer ${selectedPayment === 'card' ? 'border-gold-active' : 'border-gold'}`}
-						onClick={() => setSelectedPayment('card')}
+						className={`flex w-full items-center justify-between gap-2 py-5 px-5 rounded-4xl bg-radial-gold cursor-not-allowed border-gold ${selectedPayment === 'card' ? 'border-gold-active' : 'border-gold'}`}
+						// onClick удалён, чтобы блок был неинтерактивным
+						style={{ opacity: 0.7 }}
 					>
 						<div className="flex items-center gap-1.5">
 							<input
@@ -154,20 +155,21 @@ function PaymentContent() {
 								name="payment-method"
 								value="card"
 								checked={selectedPayment === 'card'}
-								onChange={() => setSelectedPayment('card')}
+								onChange={() => {}} // пустая функция, чтобы не менялось состояние
 								className="radio-custom"
+								disabled
 							/>
 							<label
 								htmlFor="payment-method-2"
-								className="text-radio-label"
+								className="text-radio-label text-radio-label-disabled text-gray-400"
 							>
-								Оплатить через банковскую карту
+								Оплатить через банковскую карту (временно недоступно)
 							</label>
 						</div>
 						<Image
 							src="/card.png"
 							alt="card"
-							className="object-contain"
+							className="object-contain opacity-70"
 							width={23}
 							height={22}
 						/>
@@ -243,12 +245,12 @@ function PaymentContent() {
 				</div>
 			</div>
 			{/* Кнопка тестовой оплаты */}
-			<button
+			{/* <button
 				onClick={() => (window.location.href = '/payment/success?transaction=test')}
 				className="mt-10 w-full max-w-4xl py-4 rounded-card bg-gradient-to-b from-green-500 to-green-700 text-white text-xl font-bold shadow-lg"
 			>
 				Тестовая оплата (перейти на главную)
-			</button>
+			</button> */}
 			{/* Модальное окно политики конфиденциальности */}
 			{showPrivacyModal && (
 				<div

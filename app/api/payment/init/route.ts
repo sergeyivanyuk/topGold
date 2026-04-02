@@ -1,5 +1,5 @@
 import { getPaymentService } from '@/services/payment/payment.service'
-import { PaymentMethod, PaymentRequest } from '@/types/payment'
+import { PaymentMethod, PaymentRequest, PaymentStatus } from '@/types/payment'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
@@ -33,6 +33,11 @@ export async function POST(request: NextRequest) {
 
 		const paymentService = await getPaymentService()
 		const paymentResponse = await paymentService.initPayment(paymentRequest)
+
+		// Если платеж не удалось инициировать, возвращаем ошибку 400
+		if (paymentResponse.status === PaymentStatus.FAILED || paymentResponse.status === PaymentStatus.CANCELED) {
+			return NextResponse.json({ error: paymentResponse.message || 'Не удалось инициировать платеж' }, { status: 400 })
+		}
 
 		return NextResponse.json(paymentResponse, { status: 200 })
 	} catch (error) {

@@ -42,7 +42,7 @@ export class PlategaPaymentService extends PaymentService {
 
 	async initPayment(request: PaymentRequest): Promise<PaymentResponse> {
 		const transactionId = this.generateTransactionId()
-		const amount = request.price
+		const amount = request.price // сумма в рублях (как в документации Platega)
 		const paymentMethod = this.mapPaymentMethod(request.paymentMethod)
 
 		const body = {
@@ -55,7 +55,7 @@ export class PlategaPaymentService extends PaymentService {
 			description: `Оплата тарифа ${request.tariff}`,
 			return: `${process.env.NEXT_PUBLIC_BASE_URL}/payment/success?transaction=${transactionId}`,
 			failedUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/payment/failed?transaction=${transactionId}`,
-			payload: request.nickname || ''
+			payload: request.nickname || 'guest'
 		}
 
 		try {
@@ -81,10 +81,11 @@ export class PlategaPaymentService extends PaymentService {
 						const recommendedAmounts = [1001, 2002, 3001]
 						const closestAmount = recommendedAmounts.find(a => a >= amount) || recommendedAmounts[0]
 
+						const errorMessage = `Нет доступных реквизитов для суммы ${amount} RUB. Попробуйте сумму ${closestAmount} RUB или выберите другой метод оплаты.`
 						return {
 							paymentId: transactionId,
 							status: PaymentStatus.FAILED,
-							message: `Нет доступных реквизитов для суммы ${amount} RUB. Попробуйте сумму ${closestAmount} RUB.`
+							message: errorMessage
 						}
 					}
 
@@ -100,13 +101,34 @@ export class PlategaPaymentService extends PaymentService {
 							message: 'Повторите попытку оплаты (конфликт идентификаторов)'
 						}
 					}
+
+					// Другие ошибки 400
+					return {
+						paymentId: transactionId,
+						status: PaymentStatus.FAILED,
+						message: `Ошибка Platega: ${data.message || 'Неизвестная ошибка'}`
+					}
 				}
 
 				throw new Error(data.message || `HTTP ${response.status}`)
 			}
 
 			// Успешный ответ
+			// Проверяем наличие redirect или paymentUrl
 			const paymentUrl = data.redirect || data.paymentUrl
+			if (!paymentUrl) {
+				// Если нет redirect, возможно Platega вернул ошибку в успешном ответе
+				console.error('Platega response missing redirect/paymentUrl. Full response:', data)
+
+				// Проверяем, есть ли сообщение об ошибке в ответе
+				const errorMessage = data.message || data.error || 'Platega не вернул ссылку для оплаты'
+				return {
+					paymentId: transactionId,
+					status: PaymentStatus.FAILED,
+					message: `Ошибка Platega: ${errorMessage}. Ответ: ${JSON.stringify(data)}`
+				}
+			}
+
 			return {
 				paymentId: transactionId,
 				status: PaymentStatus.PENDING,

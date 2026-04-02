@@ -27,8 +27,6 @@ export async function POST(request: NextRequest) {
 		// Обновляем статус платежа в БД, начисляем вращения и т.д.
 		// TODO: реализовать логику обновления состояния платежа и начисления наград
 
-		console.log('Webhook processed:', result)
-
 		return NextResponse.json({ success: true, ...result }, { status: 200 })
 	} catch (error) {
 		console.error('Ошибка обработки вебхука:', error)

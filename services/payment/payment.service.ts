@@ -16,7 +16,6 @@ export abstract class PaymentService {
  */
 export class MockPaymentService extends PaymentService {
 	async initPayment(request: PaymentRequest): Promise<PaymentResponse> {
-		console.log('MockPaymentService: initPayment', request)
 		// Генерируем fake paymentId
 		const paymentId = `mock_${Date.now()}_${Math.random().toString(36).substring(2)}`
 		// Имитируем ссылку на платежный шлюз, который сразу редиректит на success
@@ -31,14 +30,12 @@ export class MockPaymentService extends PaymentService {
 	}
 
 	async checkPayment(paymentId: string): Promise<PaymentStatus> {
-		console.log('MockPaymentService: checkPayment', paymentId)
 		// Симулируем успешный платеж через 2 секунды
 		const isSuccess = paymentId.includes('mock') && Math.random() > 0.3
 		return isSuccess ? PaymentStatus.SUCCESS : PaymentStatus.FAILED
 	}
 
 	async handleWebhook(data: any): Promise<{ status: PaymentStatus; paymentId: string }> {
-		console.log('MockPaymentService: handleWebhook', data)
 		// В тестовом режиме просто возвращаем успех
 		return {
 			status: PaymentStatus.SUCCESS,
@@ -57,13 +54,11 @@ export async function getPaymentService(): Promise<PaymentService> {
 
 	// Если явно указано использовать mock, возвращаем MockPaymentService
 	if (useMock) {
-		console.log('Using MockPaymentService (explicitly configured)')
 		return new MockPaymentService()
 	}
 
 	// Если есть учетные данные Platega, используем реальный сервис
 	if (hasPlategaCredentials) {
-		console.log('Using PlategaPaymentService')
 		const { PlategaPaymentService } = await import('./providers/platega.service')
 		return new PlategaPaymentService()
 	}

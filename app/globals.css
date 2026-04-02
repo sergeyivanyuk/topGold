@@ -350,6 +350,12 @@
 		background-image: linear-gradient(180deg, rgba(255, 233.54, 111.93, 0.9) 0%, rgba(234, 178, 57, 0.9) 15%, rgba(213, 156, 65, 0.9) 100%);
 	}
 
+	.radio-custom:disabled {
+		border-color: rgba(255, 233.54, 111.93, 0.5);
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
 	/* Текст для радио-лейбла */
 	.text-radio-label {
 		background-image: linear-gradient(to bottom, #ffffff 0%, #949494 100%);
@@ -364,6 +370,9 @@
 		text-shadow:
 			1px 1px #2525253d,
 			0 0 4px #ffffff80;
+	}
+	.text-radio-label-disabled {
+		font-size: 10px;
 	}
 
 	/* Текст для слайдов */
