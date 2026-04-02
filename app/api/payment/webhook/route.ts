@@ -3,7 +3,23 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
 	try {
-		// В реальном провайдере здесь должна быть проверка подписи/авторизации
+		// Проверка аутентификации через заголовки Platega
+		const merchantId = request.headers.get('X-MerchantId')
+		const secret = request.headers.get('X-Secret')
+
+		const expectedMerchantId = process.env.PLATEGA_MERCHANT_ID
+		const expectedSecret = process.env.PLATEGA_API_KEY
+
+		// Если в окружении есть учетные данные Platega, проверяем их
+		if (expectedMerchantId && expectedSecret) {
+			if (merchantId !== expectedMerchantId || secret !== expectedSecret) {
+				console.warn('Неавторизованный вебхук: неверные учетные данные')
+				return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+			}
+		} else {
+			console.warn('Вебхук принят без проверки: учетные данные Platega не настроены')
+		}
+
 		const body = await request.json()
 		const paymentService = await getPaymentService()
 		const result = await paymentService.handleWebhook(body)

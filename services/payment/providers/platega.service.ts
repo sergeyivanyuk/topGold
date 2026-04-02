@@ -23,9 +23,10 @@ export class PlategaPaymentService extends PaymentService {
 		const mapping: Record<PaymentMethod, number> = {
 			[PaymentMethod.SBP]: 2, // СБП / QR
 			[PaymentMethod.CARD]: 10, // CardRu (карты МИР)
-			[PaymentMethod.YOOMONEY]: 1, // предположительно P2P (не указано в доке)
-			[PaymentMethod.QIWI]: 1,
-			[PaymentMethod.OTHER]: 1
+			[PaymentMethod.INTERNATIONAL]: 12, // Международный эквайринг
+			[PaymentMethod.YOOMONEY]: 1, // P2P метод (требует уточнения у Platega)
+			[PaymentMethod.QIWI]: 1, // P2P метод (требует уточнения у Platega)
+			[PaymentMethod.OTHER]: 1 // P2P метод по умолчанию
 		}
 		return mapping[method] || 1
 	}
@@ -72,6 +73,35 @@ export class PlategaPaymentService extends PaymentService {
 
 			if (!response.ok) {
 				console.error('Platega API error:', data)
+
+				// Обработка специфичных ошибок Platega API
+				if (data.statusCode === 400) {
+					if (data.message?.includes('No available requisites')) {
+						// Для P2P методов рекомендуем суммы 1001, 2002, 3001
+						const recommendedAmounts = [1001, 2002, 3001]
+						const closestAmount = recommendedAmounts.find(a => a >= amount) || recommendedAmounts[0]
+
+						return {
+							paymentId: transactionId,
+							status: PaymentStatus.FAILED,
+							message: `Нет доступных реквизитов для суммы ${amount} RUB. Попробуйте сумму ${closestAmount} RUB.`
+						}
+					}
+
+					if (data.message?.includes('Transaction already exists')) {
+						// Генерируем новый transactionId и повторяем запрос
+						const newTransactionId = this.generateTransactionId()
+						body.id = newTransactionId
+
+						// В реальном приложении здесь должен быть рекурсивный вызов с лимитом попыток
+						return {
+							paymentId: newTransactionId,
+							status: PaymentStatus.FAILED,
+							message: 'Повторите попытку оплаты (конфликт идентификаторов)'
+						}
+					}
+				}
+
 				throw new Error(data.message || `HTTP ${response.status}`)
 			}
 
@@ -81,7 +111,11 @@ export class PlategaPaymentService extends PaymentService {
 				paymentId: transactionId,
 				status: PaymentStatus.PENDING,
 				paymentUrl,
-				message: 'Платеж инициирован'
+				message: 'Платеж инициирован',
+				additionalData: {
+					expiresIn: data.expiresIn,
+					usdtRate: data.usdtRate
+				}
 			}
 		} catch (error: any) {
 			console.error('Failed to init payment with Platega:', error)

@@ -3,6 +3,7 @@
 export enum PaymentMethod {
 	SBP = 'sbp',
 	CARD = 'card',
+	INTERNATIONAL = 'international',
 	YOOMONEY = 'yoomoney',
 	QIWI = 'qiwi',
 	OTHER = 'other'
@@ -38,6 +39,11 @@ export interface PaymentResponse {
 	status: PaymentStatus
 	paymentUrl?: string // ссылка для редиректа на оплату
 	message?: string
+	additionalData?: {
+		expiresIn?: string
+		usdtRate?: number
+		[key: string]: any
+	}
 }
 
 export interface PaymentWebhookData {

@@ -52,11 +52,28 @@ export class MockPaymentService extends PaymentService {
  * В зависимости от конфигурации окружения возвращает mock или реальный сервис.
  */
 export async function getPaymentService(): Promise<PaymentService> {
-	const useMock = process.env.NEXT_PUBLIC_USE_MOCK_PAYMENT === 'true' || process.env.NODE_ENV === 'development'
-	if (useMock && !process.env.PLATEGA_MERCHANT_ID) {
+	const useMock = process.env.NEXT_PUBLIC_USE_MOCK_PAYMENT === 'true'
+	const hasPlategaCredentials = process.env.PLATEGA_MERCHANT_ID && process.env.PLATEGA_API_KEY
+
+	// Если явно указано использовать mock, возвращаем MockPaymentService
+	if (useMock) {
+		console.log('Using MockPaymentService (explicitly configured)')
 		return new MockPaymentService()
 	}
-	// Используем Platega как основной провайдер
-	const { PlategaPaymentService } = await import('./providers/platega.service')
-	return new PlategaPaymentService()
+
+	// Если есть учетные данные Platega, используем реальный сервис
+	if (hasPlategaCredentials) {
+		console.log('Using PlategaPaymentService')
+		const { PlategaPaymentService } = await import('./providers/platega.service')
+		return new PlategaPaymentService()
+	}
+
+	// По умолчанию в development используем mock, в production - предупреждение
+	if (process.env.NODE_ENV === 'development') {
+		console.warn('Using MockPaymentService: Platega credentials not configured')
+		return new MockPaymentService()
+	}
+
+	// В production без учетных данных - ошибка
+	throw new Error('Platega credentials are required for production. Set PLATEGA_MERCHANT_ID and PLATEGA_API_KEY environment variables.')
 }
